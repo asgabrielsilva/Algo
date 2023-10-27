@@ -2,7 +2,19 @@
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 
-const genres = ref([])
+const genres = ref([]);
+
+const TVs = ref([]);
+
+const listTv = async (genreId) => {
+    const response = await api.get('discover/tv', {
+        params: {
+            with_genres: genreId,
+            language: 'pt-BR'
+        }
+    });
+    TVs.value = response.data.results
+};
 
 onMounted(async () => {
   const response = await api.get('genre/tv/list?language=pt-BR')
@@ -13,10 +25,22 @@ onMounted(async () => {
 <template>
     <h1>Programas de TV</h1>
     <ul class="genre-list">
-      <li v-for="genre in genres" :key="genre.id" class="genre-item">
+      <li v-for="genre in genres" :key="genre.id" @click="listTv(genre.id)" class="genre-item">
           {{ genre.name }}
       </li>
     </ul>
+    <div class="movie-list">
+  <div v-for="TV in TVs" :key="TV.id" class="movie-card">
+
+    <div class="movie-details">
+      <p class="movie-title">{{ TV.name }}</p>
+      <p class="movie-release-date">{{ TV.first_air_date }}</p>
+      <p class="movie-genres">{{ TV.genre_ids }}</p>
+      <p class="movie-title">{{ TV.original_name }}</p>
+    </div>
+    
+  </div>
+</div>
   </template>
   
   <style scoped>
@@ -44,4 +68,28 @@ onMounted(async () => {
     background-color: #7d8a2e;
     box-shadow: 0 0 0.5rem #5d6424;
   }
+  .movie-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.movie-card {
+  width: 15rem;
+  height: 15rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 0 0.5rem #000;
+}
+
+.movie-details {
+  padding: 0 0.5rem;
+}
+
+.movie-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  line-height: 1.3rem;
+  height: 3.2rem;
+}
   </style>
