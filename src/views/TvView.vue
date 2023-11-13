@@ -32,6 +32,8 @@ onMounted(async () => {
     <div class="movie-list">
   <div v-for="TV in TVs" :key="TV.id" class="movie-card">
 
+    <img :src="`https://image.tmdb.org/t/p/w500${TV.poster_path}`" :alt="TV.name" />
+
     <div class="movie-details">
       <p class="movie-title">{{ TV.name }}</p>
       <p class="movie-release-date">{{ TV.first_air_date }}</p>
@@ -76,12 +78,18 @@ onMounted(async () => {
 
 .movie-card {
   width: 15rem;
-  height: 15rem;
+  height: 30rem;
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 0 0.5rem #000;
 }
 
+.movie-card img {
+  width: 100%;
+  height: 20rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0.5rem #000;
+}
 .movie-details {
   padding: 0 0.5rem;
 }

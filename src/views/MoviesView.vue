@@ -2,6 +2,10 @@
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 
+import Loading from 'vue-loading-overlay'
+
+const isLoading = ref(false);
+
 const genres = ref([]);
 const movies = ref([]);
 
@@ -28,7 +32,7 @@ onMounted(async () => {
         {{ genre.name }}
     </li>
   </ul>
-
+  <loading v-model:active="isLoading" is-full-page />
   <div class="movie-list">
   <div v-for="movie in movies" :key="movie.id" class="movie-card">
     
