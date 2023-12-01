@@ -2,11 +2,17 @@
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 
-const genres = ref([]);
+import useGenreStore from '@/stores/genre';
+import Loading from 'vue-loading-overlay'
+
+const genreStore = useGenreStore();
+const isLoading = ref(false);
+
 
 const TVs = ref([]);
 
 const listTv = async (genreId) => {
+  isLoading.value = true;
     const response = await api.get('discover/tv', {
         params: {
             with_genres: genreId,
@@ -14,21 +20,30 @@ const listTv = async (genreId) => {
         }
     });
     TVs.value = response.data.results
+    isLoading.value = false;
 };
+const formatDate = (date) => new Date(date).toLocaleDateString('pt-BR')
 
 onMounted(async () => {
-  const response = await api.get('genre/tv/list?language=pt-BR')
-  genres.value = response.data.genres
-})
+  isLoading.value = true;
+  await genreStore.getAllGenres('tv');
+  isLoading.value = false;
+});
 </script>
 
 <template>
     <h1>Programas de TV</h1>
     <ul class="genre-list">
-      <li v-for="genre in genres" :key="genre.id" @click="listTv(genre.id)" class="genre-item">
-          {{ genre.name }}
-      </li>
+      <li
+  v-for="genre in genreStore.genres"
+  :key="genre.id"
+  @click="listTv(genre.id)"
+  class="genre-item"
+>
+   {{ genre.name }} 
+</li>
     </ul>
+    <loading v-model:active="isLoading" is-full-page />
     <div class="movie-list">
   <div v-for="TV in TVs" :key="TV.id" class="movie-card">
 
@@ -36,8 +51,12 @@ onMounted(async () => {
 
     <div class="movie-details">
       <p class="movie-title">{{ TV.name }}</p>
-      <p class="movie-release-date">{{ TV.first_air_date }}</p>
-      <p class="movie-genres">{{ TV.genre_ids }}</p>
+      <p class="movie-release-date">{{ formatDate(TV.first_air_date) }}</p>
+      <p class="movie-genres">
+        <span v-for="genre_id in TV.genre_ids" :key="genre_id" @click="listTv(genre_id)">
+    {{ genreStore.getGenreName(genre_id) }} 
+  </span>
+      </p>
       <p class="movie-title">{{ TV.original_name }}</p>
     </div>
     
@@ -99,5 +118,27 @@ onMounted(async () => {
   font-weight: bold;
   line-height: 1.3rem;
   height: 3.2rem;
+}
+.movie-genres {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.2rem;
+}
+.movie-genres span {
+  background-color: #748708;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.movie-genres span:hover {
+  cursor: pointer;
+  background-color: #455a08;
+  box-shadow: 0 0 0.5rem #748708;
 }
   </style>
