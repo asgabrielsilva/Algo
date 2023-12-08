@@ -12,6 +12,7 @@ const isLoading = ref(false);
 const movies = ref([]);
 
 const listMovies = async (genreId) => {
+  genreStore.setCurrentGenreId(genreId);
   isLoading.value = true;
     const response = await api.get('discover/movie', {
         params: {
@@ -40,6 +41,7 @@ onMounted(async () => {
   :key="genre.id"
   @click="listMovies(genre.id)"
   class="genre-item"
+  :class="{ active: genre.id === genreStore.currentGenreId }"
 >
    {{ genre.name }} 
 </li>
@@ -53,8 +55,13 @@ onMounted(async () => {
       <p class="movie-title">{{ movie.title }}</p>
       <p class="movie-release-date">{{ formatDate(movie.release_date) }}</p>
       <p class="movie-genres">
-  <span v-for="genre_id in movie.genre_ids" :key="genre_id" @click="listMovies(genre_id)">
-    {{ genreStore.getGenreName(genre_id) }} 
+  <span
+  v-for="genre_id in movie.genre_ids"
+  :key="genre_id"
+  @click="listMovies(genre_id)"
+  :class="{ active: genre_id === genreStore.currentGenreId }"
+>
+   {{ genreStore.getGenreName(genre_id) }} 
   </span>
 </p>
     </div>
@@ -139,5 +146,15 @@ onMounted(async () => {
   cursor: pointer;
   background-color: #455a08;
   box-shadow: 0 0 0.5rem #748708;
+}
+.active {
+  background-color: #67b086;
+  font-weight: bolder;
+}
+
+.movie-genres span.active {
+  background-color: #abc322;
+  color: #000;
+  font-weight: bolder;
 }
 </style>

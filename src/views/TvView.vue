@@ -12,6 +12,7 @@ const isLoading = ref(false);
 const TVs = ref([]);
 
 const listTv = async (genreId) => {
+  genreStore.setCurrentGenreId(genreId);
   isLoading.value = true;
     const response = await api.get('discover/tv', {
         params: {
@@ -39,6 +40,7 @@ onMounted(async () => {
   :key="genre.id"
   @click="listTv(genre.id)"
   class="genre-item"
+  :class="{ active: genre.id === genreStore.currentGenreId }"
 >
    {{ genre.name }} 
 </li>
@@ -53,7 +55,12 @@ onMounted(async () => {
       <p class="movie-title">{{ TV.name }}</p>
       <p class="movie-release-date">{{ formatDate(TV.first_air_date) }}</p>
       <p class="movie-genres">
-        <span v-for="genre_id in TV.genre_ids" :key="genre_id" @click="listTv(genre_id)">
+      <span
+       v-for="genre_id in TV.genre_ids" 
+      :key="genre_id" 
+      @click="listTv(genre_id)"
+      :class="{ active: genre_id === genreStore.currentGenreId }"
+      >
     {{ genreStore.getGenreName(genre_id) }} 
   </span>
       </p>
@@ -140,5 +147,15 @@ onMounted(async () => {
   cursor: pointer;
   background-color: #455a08;
   box-shadow: 0 0 0.5rem #748708;
+}
+.active {
+  background-color: #67b086;
+  font-weight: bolder;
+}
+
+.movie-genres span.active {
+  background-color: #abc322;
+  color: #000;
+  font-weight: bolder;
 }
   </style>
